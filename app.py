@@ -10,7 +10,7 @@ from src.analitica import (
     verificar_swipl_instalado,
     consultar_riesgo_prolog
 )
-from src.modelos import Estudiante, ReporteCarrera
+from src.modelos import Estudiante, ReporteCarrera, NOTA_APROBATORIA
 from src.graficos import (
     grafico_distribucion_promedio,
     grafico_asistencia_vs_promedio,
@@ -345,9 +345,9 @@ with tab_riesgo:
                         st.markdown("##### Acciones Recomendadas (Python):")
                         if estudiante_obj.asistencia < 75.0:
                             st.write("❌ **Alerta de Asistencia:** El estudiante está por debajo del límite de asistencia reglamentaria (30% inasistencias). Comunicarse con Bienestar Universitario de inmediato.")
-                        if estudiante_obj.nota_prog < 10.5:
+                        if estudiante_obj.nota_prog < NOTA_APROBATORIA:
                             st.write("📖 **Tutoría de Programación:** Agendar de forma obligatoria al taller de programación los días sábados.")
-                        if estudiante_obj.nota_math < 10.5:
+                        if estudiante_obj.nota_math < NOTA_APROBATORIA:
                             st.write("📐 **Tutoría de Matemáticas:** Derivar al grupo de nivelación de Cálculo/Álgebra.")
                         if estudiante_obj.horas_estudio < 8:
                             st.write("⏱️ **Taller de Gestión del Tiempo:** Invitar al estudiante al taller virtual de técnicas de estudio y organización.")

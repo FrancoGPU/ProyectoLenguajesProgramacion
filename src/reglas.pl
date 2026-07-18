@@ -30,17 +30,22 @@ nivel_riesgo(Math, Prog, Redac, Asistencia, Horas, 'Medio') :-
 
 nivel_riesgo(_, _, _, _, _, 'Bajo').
 
+% Hecho lógico que define la nota aprobatoria mínima del sistema
+nota_aprobatoria(10.5).
+
 % Reglas para generar recomendaciones (Hechos / Inferencias)
 recomendar_alerta(Asistencia, 'Alerta de Asistencia') :-
     Asistencia < 75.0, !.
 recomendar_alerta(_, '').
 
 recomendar_math(Math, 'Tutoria de Matematicas') :-
-    Math < 10.5, !.
+    nota_aprobatoria(Limite),
+    Math < Limite, !.
 recomendar_math(_, '').
 
 recomendar_prog(Prog, 'Tutoria de Programacion') :-
-    Prog < 10.5, !.
+    nota_aprobatoria(Limite),
+    Prog < Limite, !.
 recomendar_prog(_, '').
 
 recomendar_tiempo(Horas, 'Taller de Gestion del Tiempo') :-

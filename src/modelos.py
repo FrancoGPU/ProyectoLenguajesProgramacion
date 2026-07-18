@@ -1,5 +1,7 @@
 from typing import List, Dict, Any
 
+NOTA_APROBATORIA = 10.5
+
 class Estudiante:
     """
     Representa a un estudiante universitario y encapsula sus datos y comportamientos básicos (POO).
@@ -38,8 +40,8 @@ class Estudiante:
         return round(sum(notas_validas) / len(notas_validas), 2)
 
     def obtener_estado(self) -> str:
-        """Determina si el estudiante está aprobado (promedio >= 10.5 en escala vigesimal)."""
-        return "Aprobado" if self.calcular_promedio() >= 10.5 else "Desaprobado"
+        """Determina si el estudiante está aprobado (promedio >= NOTA_APROBATORIA en escala vigesimal)."""
+        return "Aprobado" if self.calcular_promedio() >= NOTA_APROBATORIA else "Desaprobado"
 
     def to_dict(self) -> Dict[str, Any]:
         """Convierte los atributos de la instancia en un diccionario para análisis."""
