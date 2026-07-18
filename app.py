@@ -293,7 +293,7 @@ with tab_riesgo:
                         <strong>Nota Matematicas:</strong> {estudiante_obj.nota_math}<br>
                         <strong>Nota Programación:</strong> {estudiante_obj.nota_prog}<br>
                         <strong>Nota Redacción:</strong> {estudiante_obj.nota_redac}<br>
-                        <strong>Promedio General:</strong> <span style="font-size:16px; font-weight:bold; color:{'#10B981' if estudiante_obj.calcular_promedio() >= 10.5 else '#EF4444'};">{estudiante_obj.calcular_promedio()}</span> ({estudiante_obj.obtener_estado()})
+                        <strong>Promedio General:</strong> <span style="font-size:16px; font-weight:bold; color:{'#10B981' if estudiante_obj.calcular_promedio() >= NOTA_APROBATORIA else '#EF4444'};">{estudiante_obj.calcular_promedio()}</span> ({estudiante_obj.obtener_estado()})
                     </div>
                     """, unsafe_allow_html=True)
                     
