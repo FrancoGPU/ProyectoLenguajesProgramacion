@@ -1,0 +1,20 @@
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+
+# Caché de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Streamlit y variables temporales
+.streamlit/
+.ipynb_checkpoints/
+
+# Datos del sistema (opcional, los dejamos por si acaso)
+# datos/estudiantes_sucios.csv
+# datos/estudiantes_limpios.csv
