@@ -255,9 +255,16 @@ with tab_riesgo:
     else:
         st.warning(f"⚠️ Se han detectado **{len(df_alto)}** estudiantes con riesgo crítico de deserción o reprobación.")
         
+        # Filtrar alertas interactivamente
+        buscar_alerta = st.text_input("🔍 Filtrar alertas por Nombre o ID:", "")
+        if buscar_alerta:
+            df_alto_mostrar = df_alto[df_alto["Nombre"].str.contains(buscar_alerta, case=False, na=False) | df_alto["ID_Estudiante"].str.contains(buscar_alerta, case=False, na=False)]
+        else:
+            df_alto_mostrar = df_alto
+
         # Mostrar tabla resumida de riesgo alto
         st.dataframe(
-            df_alto[["ID_Estudiante", "Nombre", "Carrera", "Promedio", "Asistencia_%", "Horas_Estudio_Semana", "Indice_Riesgo"]],
+            df_alto_mostrar[["ID_Estudiante", "Nombre", "Carrera", "Promedio", "Asistencia_%", "Horas_Estudio_Semana", "Indice_Riesgo"]],
             use_container_width=True,
             hide_index=True
         )
@@ -362,17 +369,29 @@ with tab_limpieza:
     st.markdown("### Evidencia de Limpieza y Transformación de Datos (Criterio 3)")
     st.write("La rúbrica califica con **Excelente** el uso de Pandas y Numpy para realizar limpieza de datos faltantes, duplicados, outliers y formatos erróneos. A continuación se demuestra el estado de los datos **Antes** (Datos Sintéticos Sucios) y **Después** (Datos Procesados por el Pipeline).")
     
+    # Campo de búsqueda para la comparación de limpieza
+    buscar_limpieza = st.text_input("🔍 Buscar estudiante por Nombre o ID en el proceso de limpieza:", "")
+    if buscar_limpieza:
+        filtro_sucio = df_sucio["Nombre"].str.contains(buscar_limpieza, case=False, na=False) | df_sucio["ID_Estudiante"].str.contains(buscar_limpieza, case=False, na=False)
+        df_sucio_view = df_sucio[filtro_sucio]
+        
+        filtro_limpio = df_analizado["Nombre"].str.contains(buscar_limpieza, case=False, na=False) | df_analizado["ID_Estudiante"].str.contains(buscar_limpieza, case=False, na=False)
+        df_limpio_view = df_analizado[filtro_limpio]
+    else:
+        df_sucio_view = df_sucio.head(15)
+        df_limpio_view = df_analizado.head(15)
+
     col_l1, col_l2 = st.columns(2)
     
     with col_l1:
         st.subheader("1. Dataset Original (Sucio)")
         st.write("Se observan notas vacías, asistencias erróneas (-15.0%, 120.0%), duplicados e ingresos familiares negativos:")
-        st.dataframe(df_sucio.head(10), use_container_width=True)
+        st.dataframe(df_sucio_view, use_container_width=True)
         
     with col_l2:
         st.subheader("2. Dataset Procesado y Limpio")
         st.write("Los duplicados se eliminaron, las notas vacías se imputaron con la mediana de su carrera, las asistencias erróneas se acotaron con `numpy.clip` a [0-100] y los ingresos se normalizaron:")
-        st.dataframe(df_analizado.head(10), use_container_width=True)
+        st.dataframe(df_limpio_view, use_container_width=True)
 
     st.markdown("---")
     st.markdown("### Reporte Estadístico del Proceso de Limpieza")
