@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import subprocess
+import shutil
 
 # ==========================================
 # PIPELINE DE LIMPIEZA DE DATOS (FUNCIONAL)
@@ -144,3 +146,55 @@ def filtrar_estudiantes_por_riesgo(df: pd.DataFrame, nivel: str) -> pd.DataFrame
     """Filtra y devuelve a los estudiantes que pertenecen a un determinado nivel de riesgo."""
     filtrar_riesgo = lambda d: d[d["Nivel_Riesgo"] == nivel]
     return filtrar_riesgo(df).copy()
+
+# ==========================================
+# PUENTE DE COMUNICACIÓN CON SWI-PROLOG
+# ==========================================
+
+def verificar_swipl_instalado() -> bool:
+    """Verifica si swipl (SWI-Prolog) está disponible en el PATH del sistema."""
+    return shutil.which("swipl") is not None
+
+def consultar_riesgo_prolog(math: float, prog: float, redac: float, asistencia: float, horas: int) -> dict:
+    """
+    Realiza una consulta lógica a reglas.pl usando SWI-Prolog y retorna el riesgo y recomendaciones.
+    Retorna None si swipl no está instalado o si falla.
+    """
+    if not verificar_swipl_instalado():
+        return None
+        
+    try:
+        # Construimos la consulta Prolog:
+        # evaluar_estudiante(Math, Prog, Redac, Asistencia, Horas, Riesgo, RecAsis, RecMath, RecProg, RecTiempo)
+        consulta = (
+            f"evaluar_estudiante({math}, {prog}, {redac}, {asistencia}, {horas}, Riesgo, RecAsis, RecMath, RecProg, RecTiempo), "
+            f"format('~w;~w;~w;~w;~w', [Riesgo, RecAsis, RecMath, RecProg, RecTiempo]), halt."
+        )
+        
+        # Ejecutamos swipl por CLI
+        proceso = subprocess.run(
+            ["swipl", "-s", "src/reglas.pl", "-g", consulta, "-t", "halt."],
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+        
+        if proceso.returncode == 0:
+            salida = proceso.stdout.strip()
+            # En caso de que haya outputs previos de swipl, filtramos para obtener la línea con los punto y comas
+            lineas = [l for l in salida.splitlines() if ";" in l]
+            if lineas:
+                salida = lineas[-1]
+            partes = salida.split(";")
+            if len(partes) == 5:
+                return {
+                    "Nivel_Riesgo": partes[0],
+                    "RecAsistencia": partes[1] if partes[1] != "''" else "",
+                    "RecMath": partes[2] if partes[2] != "''" else "",
+                    "RecProg": partes[3] if partes[3] != "''" else "",
+                    "RecTiempo": partes[4] if partes[4] != "''" else ""
+                }
+    except Exception as e:
+        print(f"Error en consulta Prolog: {e}")
+        
+    return None

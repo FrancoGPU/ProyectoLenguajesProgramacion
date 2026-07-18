@@ -9,18 +9,19 @@
 ## 1. Introducción
 La deserción universitaria y el bajo rendimiento académico representan retos críticos para las instituciones educativas de nivel superior. La detección tardía de estudiantes con dificultades se traduce frecuentemente en la reprobación de asignaturas o en el abandono definitivo de sus estudios. 
 
-**EduAnalytics** es una solución tecnológica desarrollada en **Python** que integra técnicas de análisis de datos con programación estructurada, modular y multiparadigma. El sistema genera datos simulados de estudiantes con inconsistencias comunes de registro, los procesa a través de un pipeline funcional de limpieza de datos, analiza métricas académicas combinando Programación Orientada a Objetos (POO) y Programación Funcional (PF), y finalmente presenta un dashboard interactivo completo para la toma de decisiones.
+**EduAnalytics** es una solución tecnológica desarrollada en **Python** que integra técnicas de análisis de datos con programación estructurada, modular y multiparadigma. El sistema genera datos simulados de estudiantes con inconsistencias comunes de registro, los procesa a través de un pipeline funcional de limpieza de datos, analiza métricas académicas combinando Programación Orientada a Objetos (POO), Programación Funcional (PF), y **Programación Lógica (Prolog)**, presentando finalmente un dashboard interactivo completo para la toma de decisiones.
 
 ---
 
 ## 2. Objetivos
-* **Objetivo General:** Desarrollar un sistema de software modular en Python para identificar a estudiantes universitarios en riesgo académico y de deserción utilizando análisis de datos y visualización interactiva.
+* **Objetivo General:** Desarrollar un sistema de software modular en Python y Prolog para identificar a estudiantes universitarios en riesgo académico y de deserción utilizando análisis de datos y visualización interactiva.
 * **Objetivos Específicos:**
   1. Implementar la generación y limpieza de datos sintéticos con anomalías simulando escenarios reales de gestión escolar mediante las librerías `pandas` y `numpy`.
   2. Aplicar el paradigma de **Programación Orientada a Objetos** para modelar entidades académicas.
   3. Aplicar el paradigma de **Programación Funcional** para estructurar un flujo inmutable de procesamiento de datos y un algoritmo de cálculo de riesgo.
-  4. Garantizar la confiabilidad del código mediante **Pruebas Unitarias** exhaustivas.
-  5. Crear un dashboard web intuitivo, dinámico e interactivo mediante la herramienta **Streamlit** y gráficos de **Plotly**.
+  4. Aplicar el paradigma de **Programación Lógica (Prolog)** para la deducción inductiva de alertas y tutorías académicas.
+  5. Garantizar la confiabilidad del código mediante **Pruebas Unitarias** exhaustivas.
+  6. Crear un dashboard web intuitivo, dinámico e interactivo mediante la herramienta **Streamlit** y gráficos de **Plotly**.
 
 ---
 
@@ -32,9 +33,12 @@ El proyecto cumple con los principios de modularidad y separación de responsabi
 * `src/modelos.py` (Paradigma POO):
   * Clase `Estudiante`: Modela al alumno, encapsula su información y calcula de forma individual su promedio y estado académico.
   * Clase `ReporteCarrera`: Agrupa estudiantes de una carrera específica y calcula estadísticas agregadas (tasa de aprobación y promedio general).
-* `src/analitica.py` (Paradigma Funcional):
+* `src/analitica.py` (Paradigma Funcional y Enlace Lógico):
   * Contiene funciones de limpieza de datos puras que no modifican los dataframes de entrada sino que retornan nuevas copias.
   * Implementa funciones de orden superior y expresiones lambda para calcular el **Índice cuantitativo de Riesgo**.
+  * Contiene el puente de comunicación por subprocess para consultar las reglas de Prolog.
+* `src/reglas.pl` (Paradigma Lógico - Prolog):
+  * Define la base de conocimientos y reglas inductivas en sintaxis SWI-Prolog para categorizar riesgos y recomendar planes de tutorías individuales.
 * `src/graficos.py`: Contiene funciones encargadas de estructurar y generar las figuras gráficas de Plotly para el dashboard.
 * `app.py`: Archivo de ejecución principal que levanta el dashboard web interactivo con Streamlit.
 * `tests/test_analitica.py`: Conjunto de pruebas automatizadas diseñadas con la librería `pytest` para validar la fiabilidad de las funciones de negocio.

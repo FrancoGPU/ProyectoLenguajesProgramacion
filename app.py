@@ -3,7 +3,13 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datos.generador_datos import generar_datos_sinteticos
-from src.analitica import ejecutar_pipeline_limpieza, agregar_analitica_riesgo, filtrar_estudiantes_por_riesgo
+from src.analitica import (
+    ejecutar_pipeline_limpieza, 
+    agregar_analitica_riesgo, 
+    filtrar_estudiantes_por_riesgo,
+    verificar_swipl_instalado,
+    consultar_riesgo_prolog
+)
 from src.modelos import Estudiante, ReporteCarrera
 from src.graficos import (
     grafico_distribucion_promedio,
@@ -101,6 +107,14 @@ carrera_seleccionada = st.sidebar.selectbox("Carrera Profesional:", carreras)
 # Selector de Riesgo
 riesgos = ["Todos", "Alto", "Medio", "Bajo"]
 riesgo_seleccionado = st.sidebar.selectbox("Nivel de Riesgo de Deserción:", riesgos)
+
+# Estado del Motor Lógico (Prolog)
+st.sidebar.markdown("### Paradigma Lógico")
+prolog_activo = verificar_swipl_instalado()
+if prolog_activo:
+    st.sidebar.success("🟢 SWI-Prolog Activo")
+else:
+    st.sidebar.warning("🟡 Python (Modo Compatibilidad)")
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("### Acciones de Datos")
@@ -289,23 +303,57 @@ with tab_riesgo:
                     riesgo_nivel = fila_analitica["Nivel_Riesgo"]
                     indice_r = fila_analitica["Indice_Riesgo"]
                     
-                    color_riesgo = "#EF4444" if riesgo_nivel == "Alto" else ("#F59E0B" if riesgo_nivel == "Medio" else "#10B981")
+                    # Intentamos resolver con Prolog si está activo
+                    resultado_prolog = None
+                    if prolog_activo:
+                        resultado_prolog = consultar_riesgo_prolog(
+                            estudiante_obj.nota_math or 0.0,
+                            estudiante_obj.nota_prog or 0.0,
+                            estudiante_obj.nota_redac or 0.0,
+                            estudiante_obj.asistencia or 0.0,
+                            estudiante_obj.horas_estudio or 0
+                        )
                     
-                    st.markdown(f"Nivel de Riesgo: <span style='color:{color_riesgo}; font-weight:bold; font-size:18px;'>{riesgo_nivel}</span> (Índice de Riesgo: {indice_r})", unsafe_allow_html=True)
-                    
-                    # Generar recomendaciones personalizadas (Lógica funcional/negocio)
-                    st.markdown("##### Acciones Recomendadas:")
-                    if estudiante_obj.asistencia < 75.0:
-                        st.write("❌ **Alerta de Asistencia:** El estudiante está por debajo del límite de asistencia reglamentaria (30% inasistencias). Comunicarse con Bienestar Universitario de inmediato.")
-                    if estudiante_obj.nota_prog < 10.5:
-                        st.write("📖 **Tutoría de Programación:** Agendar de forma obligatoria al taller de programación los días sábados.")
-                    if estudiante_obj.nota_math < 10.5:
-                        st.write("📐 **Tutoría de Matemáticas:** Derivar al grupo de nivelación de Cálculo/Álgebra.")
-                    if estudiante_obj.horas_estudio < 8:
-                        st.write("⏱️ **Taller de Gestión del Tiempo:** Invitar al estudiante al taller virtual de técnicas de estudio y organización.")
-                    
-                    if riesgo_nivel == "Bajo":
-                        st.write("✅ **Felicitaciones:** El alumno mantiene un rendimiento óptimo. Se sugiere invitarlo a formar parte del programa de alumnos mentores.")
+                    if resultado_prolog:
+                        riesgo_nivel_pl = resultado_prolog["Nivel_Riesgo"]
+                        color_riesgo = "#EF4444" if riesgo_nivel_pl == "Alto" else ("#F59E0B" if riesgo_nivel_pl == "Medio" else "#10B981")
+                        
+                        st.markdown(f"Nivel de Riesgo (Deducido por Prolog): <span style='color:{color_riesgo}; font-weight:bold; font-size:18px;'>{riesgo_nivel_pl}</span>", unsafe_allow_html=True)
+                        st.markdown("##### Acciones Recomendadas por el Motor Lógico (.pl):")
+                        
+                        hay_recomendacion = False
+                        if resultado_prolog["RecAsistencia"]:
+                            st.write(f"❌ **{resultado_prolog['RecAsistencia']}:** El estudiante está por debajo del límite de asistencia reglamentaria (30% inasistencias).")
+                            hay_recomendacion = True
+                        if resultado_prolog["RecProg"]:
+                            st.write(f"📖 **{resultado_prolog['RecProg']}:** Taller obligatorio de programación los días sábados.")
+                            hay_recomendacion = True
+                        if resultado_prolog["RecMath"]:
+                            st.write(f"📐 **{resultado_prolog['RecMath']}:** Derivar al grupo de nivelación de Matemáticas.")
+                            hay_recomendacion = True
+                        if resultado_prolog["RecTiempo"]:
+                            st.write(f"⏱️ **{resultado_prolog['RecTiempo']}:** Invitar al taller virtual de técnicas de estudio.")
+                            hay_recomendacion = True
+                            
+                        if not hay_recomendacion and riesgo_nivel_pl == "Bajo":
+                            st.write("✅ **Rendimiento Óptimo:** No requiere intervenciones inmediatas. Se sugiere invitarlo como alumno mentor.")
+                    else:
+                        # Fallback: Lógica nativa en Python
+                        color_riesgo = "#EF4444" if riesgo_nivel == "Alto" else ("#F59E0B" if riesgo_nivel == "Medio" else "#10B981")
+                        st.markdown(f"Nivel de Riesgo (Fallback Python): <span style='color:{color_riesgo}; font-weight:bold; font-size:18px;'>{riesgo_nivel}</span> (Índice de Riesgo: {indice_r})", unsafe_allow_html=True)
+                        
+                        st.markdown("##### Acciones Recomendadas (Python):")
+                        if estudiante_obj.asistencia < 75.0:
+                            st.write("❌ **Alerta de Asistencia:** El estudiante está por debajo del límite de asistencia reglamentaria (30% inasistencias). Comunicarse con Bienestar Universitario de inmediato.")
+                        if estudiante_obj.nota_prog < 10.5:
+                            st.write("📖 **Tutoría de Programación:** Agendar de forma obligatoria al taller de programación los días sábados.")
+                        if estudiante_obj.nota_math < 10.5:
+                            st.write("📐 **Tutoría de Matemáticas:** Derivar al grupo de nivelación de Cálculo/Álgebra.")
+                        if estudiante_obj.horas_estudio < 8:
+                            st.write("⏱️ **Taller de Gestión del Tiempo:** Invitar al estudiante al taller virtual de técnicas de estudio y organización.")
+                        
+                        if riesgo_nivel == "Bajo":
+                            st.write("✅ **Felicitaciones:** El alumno mantiene un rendimiento óptimo. Se sugiere invitarlo a formar parte del programa de alumnos mentores.")
 
 # ====================================================
 # TAB 3: PROCESO DE LIMPIEZA DE DATOS (MUESTRA RÚBRICA)
