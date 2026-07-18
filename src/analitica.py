@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import subprocess
 import shutil
+import os
 
 # ==========================================
 # PIPELINE DE LIMPIEZA DE DATOS (FUNCIONAL)
@@ -152,8 +153,8 @@ def filtrar_estudiantes_por_riesgo(df: pd.DataFrame, nivel: str) -> pd.DataFrame
 # ==========================================
 
 def verificar_swipl_instalado() -> bool:
-    """Verifica si swipl (SWI-Prolog) está disponible en el PATH del sistema."""
-    return shutil.which("swipl") is not None
+    """Verifica si swipl (SWI-Prolog) está disponible en el PATH o en la ruta de instalación por defecto."""
+    return shutil.which("swipl") is not None or os.path.exists(r"C:\Program Files\swipl\bin\swipl.exe")
 
 def consultar_riesgo_prolog(math: float, prog: float, redac: float, asistencia: float, horas: int) -> dict:
     """
@@ -164,6 +165,9 @@ def consultar_riesgo_prolog(math: float, prog: float, redac: float, asistencia: 
         return None
         
     try:
+        # Resolver la ruta del ejecutable de Prolog
+        swipl_cmd = "swipl" if shutil.which("swipl") else r"C:\Program Files\swipl\bin\swipl.exe"
+        
         # Construimos la consulta Prolog:
         # evaluar_estudiante(Math, Prog, Redac, Asistencia, Horas, Riesgo, RecAsis, RecMath, RecProg, RecTiempo)
         consulta = (
@@ -173,7 +177,7 @@ def consultar_riesgo_prolog(math: float, prog: float, redac: float, asistencia: 
         
         # Ejecutamos swipl por CLI
         proceso = subprocess.run(
-            ["swipl", "-s", "src/reglas.pl", "-g", consulta, "-t", "halt."],
+            [swipl_cmd, "-s", "src/reglas.pl", "-g", consulta, "-t", "halt."],
             capture_output=True,
             text=True,
             timeout=5
