@@ -4,9 +4,9 @@ import subprocess
 import shutil
 import os
 
-# ==========================================
-# PIPELINE DE LIMPIEZA DE DATOS (FUNCIONAL)
-# ==========================================
+# ==============================
+# PIPELINE DE LIMPIEZA DE DATOS 
+# ==============================
 
 def eliminar_duplicados(df: pd.DataFrame) -> pd.DataFrame:
     """Elimina registros duplicados basándose en el ID del estudiante, conservando el último."""
@@ -91,9 +91,9 @@ def ejecutar_pipeline_limpieza(df: pd.DataFrame) -> pd.DataFrame:
     )
     return df_clean
 
-# ==========================================
-# ANALÍTICA Y CÁLCULO DE RIESGOS (FUNCIONAL)
-# ==========================================
+# ==============================
+# ANALÍTICA Y CÁLCULO DE RIESGOS 
+# ==============================
 
 # Expresión lambda pura para calcular un índice cuantitativo de riesgo
 # El riesgo pondera: baja nota (60%), baja asistencia (30%) y pocas horas de estudio (10%)

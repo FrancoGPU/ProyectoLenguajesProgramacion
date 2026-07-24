@@ -103,15 +103,18 @@ python -m streamlit run app.py
 ```
 La aplicación se abrirá automáticamente en tu navegador web en `http://localhost:8501`.
 
----
+## 🛠️ Comandos Útiles del Proyecto
 
-## 🧪 Ejecución de Pruebas Unitarias
+A continuación se resumen los comandos principales para instalar, ejecutar, probar y administrar el proyecto:
 
-Para correr la suite automatizada de pruebas con reporte explicativo por consola:
-
-```bash
-python -m pytest tests/ -v -s
-```
+| Acción / Propósito | Comando de Ejecución | Descripción |
+| :--- | :--- | :--- |
+| **Instalar Dependencias** | `pip install -r requirements.txt` | Instala Pandas, NumPy, Streamlit, Plotly, Pytest y Statsmodels. |
+| **Iniciar Dashboard Web** | `python -m streamlit run app.py` | Inicia el servidor local de Streamlit y abre la aplicación en `http://localhost:8501`. |
+| **Ejecutar Pruebas (Pytest)** | `python -m pytest tests/ -v -s` | Ejecuta las 6 pruebas unitarias con consola explicativa detallada. |
+| **Regenerar Dataset Sintético** | `python datos/generador_datos.py` | Genera un nuevo archivo CSV con 1000 registros e inyección de datos sucios. |
+| **Consola SWI-Prolog** | `swipl -s src/reglas.pl` | Abre la consola interactiva de Prolog cargando la base de conocimientos. |
+| **Consulta Directa Prolog (CLI)** | `swipl -s src/reglas.pl -g "evaluar_estudiante(12,8,10,65,5,R,A,M,P,T), halt."` | Evalúa directamente las reglas de un alumno desde la terminal de Windows. |
 
 ---
 
