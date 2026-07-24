@@ -1,116 +1,125 @@
-# INFORME DE PROYECTO FINAL: EduAnalytics
+# 🎓 EduAnalytics - Dashboard Inteligente de Rendimiento Académico y Alerta de Deserción Escolar
 
-**Curso:** Lenguaje de Programación  
-**Institución:** Universidad Tecnológica del Perú (UTP)  
-**Proyecto:** Dashboard Inteligente de Rendimiento Académico y Alerta de Deserción Escolar  
+[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Framework](https://img.shields.io/badge/framework-Streamlit-red.svg)](https://streamlit.io/)
+[![Logic Engine](https://img.shields.io/badge/logic-SWI--Prolog-green.svg)](https://www.swi-prolog.org/)
+[![Testing](https://img.shields.io/badge/testing-pytest-yellow.svg)](https://docs.pytest.org/)
+[![License](https://img.shields.io/badge/license-MIT-informational.svg)](LICENSE)
 
----
-
-## 1. Introducción
-La deserción universitaria y el bajo rendimiento académico representan retos críticos para las instituciones educativas de nivel superior. La detección tardía de estudiantes con dificultades se traduce frecuentemente en la reprobación de asignaturas o en el abandono definitivo de sus estudios. 
-
-**EduAnalytics** es una solución tecnológica desarrollada en **Python** que integra técnicas de análisis de datos con programación estructurada, modular y multiparadigma. El sistema genera datos simulados de estudiantes con inconsistencias comunes de registro, los procesa a través de un pipeline funcional de limpieza de datos, analiza métricas académicas combinando Programación Orientada a Objetos (POO), Programación Funcional (PF), y **Programación Lógica (Prolog)**, presentando finalmente un dashboard interactivo completo para la toma de decisiones.
+**EduAnalytics** es una solución tecnológica multiparadigma desarrollada en **Python** y **SWI-Prolog** para la gestión universitaria, el análisis predictivo de datos escolares y la prevención temprana del riesgo de deserción estudiantil.
 
 ---
 
-## 2. Objetivos
-* **Objetivo General:** Desarrollar un sistema de software modular en Python y Prolog para identificar a estudiantes universitarios en riesgo académico y de deserción utilizando análisis de datos y visualización interactiva.
-* **Objetivos Específicos:**
-  1. Implementar la generación y limpieza de datos sintéticos con anomalías simulando escenarios reales de gestión escolar mediante las librerías `pandas` y `numpy`.
-  2. Aplicar el paradigma de **Programación Orientada a Objetos** para modelar entidades académicas.
-  3. Aplicar el paradigma de **Programación Funcional** para estructurar un flujo inmutable de procesamiento de datos y un algoritmo de cálculo de riesgo.
-  4. Aplicar el paradigma de **Programación Lógica (Prolog)** para la deducción inductiva de alertas y tutorías académicas.
-  5. Garantizar la confiabilidad del código mediante **Pruebas Unitarias** exhaustivas.
-  6. Crear un dashboard web intuitivo, dinámico e interactivo mediante la herramienta **Streamlit** y gráficos de **Plotly**.
+## 📌 Características Principales
+
+* 📊 **Dashboard Interactivo:** Visualizaciones dinámicas con **Streamlit** y **Plotly** (histogramas, box plots, regresiones OLS y barras por carrera).
+* 🧹 **Pipeline ETL Funcional (PF):** Tratamiento inmutable de datos sintéticos con **Pandas** y **NumPy** (`numpy.clip`, purga de duplicados e imputación por mediana).
+* 🧩 **Modelado Orientado a Objetos (POO):** Encapsulamiento de alumnos y carreras profesionales mediante las clases `Estudiante` y `ReporteCarrera`.
+* 🧠 **Motor de Inferencia Lógico (Prolog):** Deducción automática de niveles de riesgo y recomendaciones de tutoría personalizada a través de reglas en `src/reglas.pl` con fallback dinámico en Python.
+* 🧪 **Aseguramiento de Calidad:** Pruebas unitarias automatizadas con `pytest` ($100\%$ de cobertura de lógica de negocio).
 
 ---
 
-## 3. Diseño y Arquitectura del Sistema
-El proyecto cumple con los principios de modularidad y separación de responsabilidades (Clean Architecture):
+## 🏗️ Arquitectura del Sistema
 
-### Arquitectura de Módulos:
-* `datos/generador_datos.py`: Genera un archivo CSV con 1000 estudiantes e inyecta intencionalmente anomalías (valores nulos, negativos, fechas inconsistentes y duplicados).
-* `src/modelos.py` (Paradigma POO):
-  * Clase `Estudiante`: Modela al alumno, encapsula su información y calcula de forma individual su promedio y estado académico.
-  * Clase `ReporteCarrera`: Agrupa estudiantes de una carrera específica y calcula estadísticas agregadas (tasa de aprobación y promedio general).
-* `src/analitica.py` (Paradigma Funcional y Enlace Lógico):
-  * Contiene funciones de limpieza de datos puras que no modifican los dataframes de entrada sino que retornan nuevas copias.
-  * Implementa funciones de orden superior y expresiones lambda para calcular el **Índice cuantitativo de Riesgo**.
-  * Contiene el puente de comunicación por subprocess para consultar las reglas de Prolog.
-* `src/reglas.pl` (Paradigma Lógico - Prolog):
-  * Define la base de conocimientos y reglas inductivas en sintaxis SWI-Prolog para categorizar riesgos y recomendar planes de tutorías individuales.
-* `src/graficos.py`: Contiene funciones encargadas de estructurar y generar las figuras gráficas de Plotly para el dashboard.
-* `app.py`: Archivo de ejecución principal que levanta el dashboard web interactivo con Streamlit.
-* `tests/test_analitica.py`: Conjunto de pruebas automatizadas diseñadas con la librería `pytest` para validar la fiabilidad de las funciones de negocio.
+```mermaid
+graph TD
+    subgraph Capa_Datos["📁 Capa de Datos Sintéticos"]
+        A["datos/generador_datos.py"] -->|Genera con anomalías| B["estudiantes_sucios.csv<br/>(NaN, Duplicados, Outliers)"]
+    end
 
----
+    subgraph Capa_Procesamiento["🧹 ETL & Paradigma Funcional (src/analitica.py)"]
+        B --> C["ejecutar_pipeline_limpieza()"]
+        C --> C1["1. eliminar_duplicados()"]
+        C1 --> C2["2. limpiar_fechas()"]
+        C2 --> C3["3. limpiar_asistencias() (numpy.clip)"]
+        C3 --> C4["4. imputar_notas_nulas() (pandas.median)"]
+        C4 --> C5["5. limpiar_ingreso_familiar()"]
+        C5 --> D["DataFrame Limpio & Analizado"]
+    end
 
-## 4. Algoritmo de Cálculo de Riesgo de Deserción
-El sistema evalúa el riesgo ponderando tres factores académicos clave:
-1. **Rendimiento Académico (Peso 60%):** A menor nota (escala 0-20), mayor es el factor de riesgo.
-2. **Porcentaje de Asistencia (Peso 30%):** A menor asistencia a clases, mayor es el factor de riesgo.
-3. **Horas de Estudio Semanales (Peso 10%):** Estudiantes con pocas horas de estudio independientes tienen un recargo en el riesgo.
+    subgraph Capa_Multiparadigma["🧠 Capa Multiparadigma (POO & Lógico)"]
+        D -->|Instanciación de Objetos| E["Clase Estudiante / ReporteCarrera<br/>(src/modelos.py - POO)"]
+        D -->|Consultas mediante subprocess| F["Motor SWI-Prolog<br/>(src/reglas.pl - Lógico)"]
+        F -->|Inferencia deductiva| G["Diagnóstico y Recomendaciones<br/>de Tutoría Individual"]
+    end
 
-### Fórmula Matemática (Lambda):
-$$\text{Índice de Riesgo} = \left(1 - \frac{\text{Promedio}}{20}\right) \times 0.6 + \left(1 - \frac{\text{Asistencia}}{100}\right) \times 0.3 + \left(1 - \frac{\min(\text{Horas}, 20)}{20}\right) \times 0.1$$
+    subgraph Capa_Presentacion["💻 Presentación & Dashboard (app.py)"]
+        E --> H["Streamlit Web UI"]
+        G --> H
+        D --> I["Visualizaciones Plotly<br/>(src/graficos.py)"]
+        I --> H
+    end
 
-* **Riesgo Alto:** $\text{Índice} \ge 0.55$ o $\text{Asistencia} < 70\%$.
-* **Riesgo Medio:** $0.35 \le \text{Índice} < 0.55$.
-* **Riesgo Bajo:** $\text{Índice} < 0.35$.
-
----
-
-## 5. Proceso de Limpieza y Tratamiento de Datos
-El pipeline en `src/analitica.py` ejecuta consecutivamente los siguientes tratamientos sobre el dataset crudo:
-1. **Eliminación de Duplicados:** Remueve registros con `ID_Estudiante` repetidos, conservando el último registro.
-2. **Imputación de Calificaciones Nulas:** Identifica notas vacías (`NaN`) o fuera de rango (menores a 0 o mayores a 20) y las reemplaza con la mediana de las notas de ese curso para la carrera del estudiante.
-3. **Limpieza de Asistencia:** Clampa los porcentajes de asistencia erróneos (como -15% o 130%) al rango lógico $[0, 100]$ usando `numpy.clip`.
-4. **Tratamiento del Ingreso Familiar:** Transforma valores monetarios negativos a positivos (valor absoluto) y llena vacíos con la mediana general.
-5. **Estandarización de Fechas:** Analiza múltiples formatos de fecha e introduce una fecha de inicio de semestre única para registros faltantes.
-
----
-
-## 6. Pruebas y Validación (Pytest)
-Para garantizar la solidez de las funciones de analítica y limpieza, se utiliza `pytest`. Las pruebas validan de forma aislada:
-* Que las asistencias sean acotadas correctamente.
-* Que los duplicados de estudiantes se purguen.
-* Que los valores nulos reciban la imputación estadística correspondiente.
-* Que los niveles de riesgo concuerden con las notas del estudiante.
-
-Ejecución de pruebas:
-```bash
-pytest tests/
+    style Capa_Datos fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#fff
+    style Capa_Procesamiento fill:#0f172a,stroke:#10b981,stroke-width:2px,color:#fff
+    style Capa_Multiparadigma fill:#1e1b4b,stroke:#8b5cf6,stroke-width:2px,color:#fff
+    style Capa_Presentacion fill:#1e293b,stroke:#f59e0b,stroke-width:2px,color:#fff
 ```
 
 ---
 
-## 7. Instrucciones de Instalación y Ejecución
+## 📂 Estructura del Repositorio
 
-### Requisitos Previos:
-Tener instalado **Python 3.10 o superior**.
-
-### Instalación de dependencias:
-1. Clonar o abrir la carpeta del proyecto.
-2. Abrir la consola y ejecutar:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-### Ejecutar la aplicación:
-Para iniciar el Dashboard interactivo local, ejecutar:
-```bash
-streamlit run app.py
+```text
+ProyectoLenguajesProgramacion/
+├── app.py                      # Punto de entrada principal (Dashboard Streamlit)
+├── datos/
+│   ├── generador_datos.py      # Script de generación de datos sintéticos con anomalías
+│   └── estudiantes_sucios.csv # Dataset inicial con duplicados, NaNs y outliers
+├── src/
+│   ├── analitica.py            # Pipeline ETL funcional, cálculo de riesgo y puente Prolog
+│   ├── modelos.py              # Definición de clases POO (Estudiante y ReporteCarrera)
+│   ├── graficos.py             # Generador de figuras y gráficos interactivos Plotly
+│   └── reglas.pl               # Base de conocimientos y reglas inductivas en SWI-Prolog
+├── tests/
+│   └── test_analitica.py       # Pruebas unitarias automatizadas con Pytest
+├── requirements.txt            # Dependencias del proyecto Python
+└── README.md                   # Documentación principal del repositorio
 ```
-Se abrirá automáticamente una ventana en el navegador web (por defecto en `http://localhost:8501`).
 
 ---
 
-## 8. Conclusiones y Fuentes
-* **Conclusión 1:** El uso conjunto de POO y Programación Funcional permite un diseño óptimo. POO estructura la lógica del dominio, mientras que las técnicas funcionales optimizan la manipulación inmutable de tablas de datos.
-* **Conclusión 2:** Las herramientas de visualización interactiva facilitan enormemente el trabajo de los tutores académicos al resumir cientos de registros escolares en alarmas visuales tempranas e intuitivas.
-* **Conclusión 3:** El uso de Numpy y Pandas demostró ser eficiente para procesar de forma vectorizada tareas de limpieza de datos, reduciendo considerablemente la complejidad del código.
+## 🚀 Instalación y Ejecución
 
-### Fuentes:
-* Documentación Oficial de Pandas: https://pandas.pydata.org/
-* Documentación de Streamlit: https://docs.streamlit.io/
-* Rúbrica oficial del curso de Lenguaje de Programación.
+### 1. Requisitos Previos
+* **Python 3.10** o superior.
+* *(Opcional)* **SWI-Prolog** instalado en el sistema (`swipl`). Si no se encuentra instalado, el sistema activará automáticamente el *Modo Compatibilidad en Python*.
+
+### 2. Instalación de Dependencias
+Clona el repositorio e instala los paquetes requeridos:
+
+```bash
+git clone https://github.com/FrancoGPU/ProyectoLenguajesProgramacion.git
+cd ProyectoLenguajesProgramacion
+pip install -r requirements.txt
+```
+
+### 3. Iniciar el Dashboard Web
+Ejecuta la aplicación web interactiva en Streamlit:
+
+```bash
+python -m streamlit run app.py
+```
+La aplicación se abrirá automáticamente en tu navegador web en `http://localhost:8501`.
+
+---
+
+## 🧪 Ejecución de Pruebas Unitarias
+
+Para correr la suite automatizada de pruebas con reporte explicativo por consola:
+
+```bash
+python -m pytest tests/ -v -s
+```
+
+---
+
+## 👥 Autores
+
+* **Franco Paolo Garcia Urbano** - *Desarrollador* - [FrancoGPU](https://github.com/FrancoGPU)
+* **Yonathan Edgar Jauregui Granados** - *Desarrollador*
+
+**Curso:** Lenguajes de Programación  
+**Docente:** Giusephy Hugo Valladares Peña  
+**Institución:** Universidad Tecnológica del Perú (UTP) - 2026-I
