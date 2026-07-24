@@ -29,58 +29,51 @@ def df_sucio():
 
 def test_eliminar_duplicados(df_sucio):
     df_clean = eliminar_duplicados(df_sucio)
-    # Debe haber 3 registros únicos
+    print("\n   [OK] PURGA DE DUPLICADOS: 4 registros iniciales -> 3 registros unicos procesados.")
     assert len(df_clean) == 3
-    # Debe mantener el último duplicado insertado ("last")
     registro_u001 = df_clean[df_clean["ID_Estudiante"] == "U001"].iloc[0]
     assert registro_u001["Nota_Prog"] == 14.0
 
 def test_limpiar_asistencias(df_sucio):
     df_clean = limpiar_asistencias(df_sucio)
-    # Las asistencias deben estar acotadas entre 0 y 100
+    print("\n   [OK] NORMALIZACION DE ASISTENCIA: Asistencias -10% y 120% acotadas a [0%, 100%].")
     assert df_clean.loc[df_clean["ID_Estudiante"] == "U002", "Asistencia_%"].values[0] == 0.0
     assert df_clean.loc[df_clean["ID_Estudiante"] == "U003", "Asistencia_%"].values[0] == 100.0
 
 def test_imputar_notas_nulas(df_sucio):
     df_clean = imputar_notas_nulas(df_sucio)
-    # La nota nula de U002 en Math debería imputarse con la mediana de Psicología (que es 15.0)
     nota_u002 = df_clean.loc[df_clean["ID_Estudiante"] == "U002", "Nota_Math"].values[0]
-    assert nota_u002 == 15.0
-    
-    # La nota nula de U003 en Prog de Derecho no tiene otros alumnos para calcular la mediana,
-    # por lo que debe tomar el valor por defecto (11.0)
     nota_u003 = df_clean.loc[df_clean["ID_Estudiante"] == "U003", "Nota_Prog"].values[0]
+    print(f"\n   [OK] IMPUTACION ESTADISTICA: Nota nula de U002 imputada con mediana de Psicologia ({nota_u002}).")
+    assert nota_u002 == 15.0
     assert nota_u003 == 11.0
 
 def test_limpiar_ingreso_familiar(df_sucio):
     df_clean = limpiar_ingreso_familiar(df_sucio)
-    # El ingreso negativo debe convertirse en absoluto (positivo)
-    assert df_clean.loc[df_clean["ID_Estudiante"] == "U002", "Ingreso_Familiar"].values[0] == 1200.0
-    # El ingreso nulo de U003 debe llenarse con la mediana (mediana de [2500, 1200, 2500] es 2500.0)
+    ingreso_u002 = df_clean.loc[df_clean["ID_Estudiante"] == "U002", "Ingreso_Familiar"].values[0]
+    print(f"\n   [OK] CORRECCION MONETARIA: Ingreso negativo de -1200 a valor absoluto ({ingreso_u002}) y nulos imputados.")
+    assert ingreso_u002 == 1200.0
     assert df_clean.loc[df_clean["ID_Estudiante"] == "U003", "Ingreso_Familiar"].values[0] == 2500.0
 
 def test_calcular_indice_riesgo():
-    # Estudiante excelente (gpa=18, asistencia=95, horas=20) -> Riesgo bajo
     riesgo_bajo = calcular_indice_riesgo(18.0, 95.0, 20)
-    # Estudiante crítico (gpa=5, asistencia=50, horas=2) -> Riesgo alto
     riesgo_alto = calcular_indice_riesgo(5.0, 50.0, 2)
-    
+    print(f"\n   [OK] CALCULO MATEMATICO DE RIESGO: Alumno regular (Indice={riesgo_bajo}) vs Alumno critico (Indice={riesgo_alto}).")
     assert riesgo_bajo < riesgo_alto
     assert riesgo_bajo < 0.3
     assert riesgo_alto > 0.6
 
 def test_evaluar_riesgo_desercion():
-    # Un estudiante con baja asistencia (< 70%) debe dar siempre riesgo "Alto"
     alumno_ausente = pd.Series({
         "Nota_Math": 15.0, "Nota_Prog": 16.0, "Nota_Redac": 15.0,
         "Asistencia_%": 65.0, "Horas_Estudio_Semana": 15
     })
-    
-    # Un estudiante con buenas notas y asistencia debe dar riesgo "Bajo"
     alumno_bueno = pd.Series({
         "Nota_Math": 18.0, "Nota_Prog": 17.0, "Nota_Redac": 16.0,
         "Asistencia_%": 98.0, "Horas_Estudio_Semana": 20
     })
-    
-    assert evaluar_riesgo_desercion(alumno_ausente) == "Alto"
-    assert evaluar_riesgo_desercion(alumno_bueno) == "Bajo"
+    res_ausente = evaluar_riesgo_desercion(alumno_ausente)
+    res_bueno = evaluar_riesgo_desercion(alumno_bueno)
+    print(f"\n   [OK] CLASIFICACION CUALITATIVA: Asistencia < 70% clasificada como '{res_ausente}' | Alumno excelente como '{res_bueno}'.")
+    assert res_ausente == "Alto"
+    assert res_bueno == "Bajo"

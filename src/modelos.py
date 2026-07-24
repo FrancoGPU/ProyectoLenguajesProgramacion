@@ -1,6 +1,6 @@
 from typing import List, Dict, Any
 
-NOTA_APROBATORIA = 11.5
+NOTA_APROBATORIA = 11.50
 
 class Estudiante:
     """

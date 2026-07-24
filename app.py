@@ -222,7 +222,7 @@ with kpi4:
 tab_dashboard, tab_riesgo, tab_limpieza = st.tabs([
     "📊 Análisis General y Gráficos", 
     "🚨 Alertas y Alumnos en Riesgo", 
-    "🧹 Proceso de Limpieza (Rúbrica)"
+    "🧹 Proceso de Limpieza"
 ])
 
 # ====================================================
