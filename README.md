@@ -119,6 +119,7 @@ python -m pytest tests/ -v -s
 
 * **Franco Paolo Garcia Urbano** - *Desarrollador* - [FrancoGPU](https://github.com/FrancoGPU)
 * **Yonathan Edgar Jauregui Granados** - *Desarrollador*
+* **Jefferson Jesus Lee Silva Zavala** - *Desarrollador*
 
 **Curso:** Lenguajes de Programación  
 **Docente:** Giusephy Hugo Valladares Peña  
